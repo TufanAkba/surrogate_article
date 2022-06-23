@@ -1,0 +1,1 @@
+Radn_data folder is required for saving Monte-Carlo Method populated boundary conditions. If same lenght previously solved. Existing values are used for receiver solution. Otherwise, new data is populated and saved under this folder.
