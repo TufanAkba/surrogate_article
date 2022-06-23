@@ -23,11 +23,17 @@ Python 3.9.13
 Package                       Version
 ----------------------------- -----------
 matplotlib                    3.5.2
+
 numpy                         1.22.3
+
 openmdao                      3.18.0
+
 pandas                        1.4.2
+
 pip                           21.2.4
+
 scipy                         1.7.3
+
 seaborn                       0.11.2
 
 Write article information after publication here:
