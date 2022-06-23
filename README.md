@@ -17,4 +17,17 @@ If you want to see pair plots 'data concat.py' file must be run for the data. Th
 4. Running optimization with surrogate model:
 User run 'MDAOMetaModel_Opt.py' file for surrogate-based optimization. User can alter the parameters inside the code. Do not miss to update train folder location in 'surr' class defined in the options as 'test_folder' parameter.
 
+Important pip dependencies:
+Python 3.9.13
+
+Package                       Version
+----------------------------- -----------
+matplotlib                    3.5.2
+numpy                         1.22.3
+openmdao                      3.18.0
+pandas                        1.4.2
+pip                           21.2.4
+scipy                         1.7.3
+seaborn                       0.11.2
+
 Write article information after publication here:
