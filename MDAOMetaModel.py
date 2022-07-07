@@ -5,18 +5,12 @@ Created on Wed Jun  8 11:23:26 2022
 
 @author: tufanakba
 Meta model test for problem solving
-
-Before running this file please locate the test and validation csv files under
-seperate folder and name them in the code tagged below as TODO:
-    
-
-To create pair graph all csv files must be combined as a single csv. If you 
-want pair graph run data concat.py file first 
 """
 
 import numpy as np
 import openmdao.api as om
 import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size': 16})
 import seaborn as sns
 import pandas as pd
 
@@ -26,8 +20,7 @@ if __name__ == "__main__":
     p = om.Problem()
     
     #get train data
-    # TODO: navigate the name of the training data .csv s' folder here
-    folder = 'test'
+    folder = '4_5'
     vol = np.loadtxt(folder + '/vol.csv')
     Tfo = np.loadtxt(folder + '/Tfo.csv')
     Tfi = np.loadtxt(folder + '/Tfi.csv')
@@ -37,14 +30,11 @@ if __name__ == "__main__":
     L = np.loadtxt(folder + '/L.csv')
     ins = np.loadtxt(folder + '/ins.csv')
     
-    # Those models are the working surrogates
     surr = om.MetaModelUnStructuredComp(default_surrogate=om.ResponseSurface())
     # surr = om.MetaModelUnStructuredComp(default_surrogate=om.NearestNeighbor(interpolant_type='linear'))
     # surr = om.MetaModelUnStructuredComp(default_surrogate=om.NearestNeighbor(interpolant_type='rbf', num_neighbors=5, rbf_family=-2))
     # surr = om.MetaModelUnStructuredComp(default_surrogate=om.NearestNeighbor(interpolant_type='weighted'))
-    
-    # !!! Kriging is not working. Just added as an opposible option for testing!
-    # surr = om.MetaModelUnStructuredComp(default_surrogate=om.KrigingSurrogate(eval_rmse=False))
+    # surr = om.MetaModelUnStructuredComp(default_surrogate=om.KrigingSurrogate(eval_rmse= True))
     
     surr.add_input('Tfi',training_data = Tfi)
     surr.add_input('m_dot',training_data = m_d)
@@ -59,7 +49,6 @@ if __name__ == "__main__":
     p.setup()
     
     #get validation data
-    # TODO: navigate the name of the validation data .csv s' folder here
     folder = 'valid'
     vol = np.loadtxt(folder + '/vol.csv')
     Tfo = np.loadtxt(folder + '/Tfo.csv')
@@ -70,14 +59,11 @@ if __name__ == "__main__":
     L = np.loadtxt(folder + '/L.csv')
     ins = np.loadtxt(folder + '/ins.csv')
     
-    # !!! this part for pair plots for simplicity all csv combined as a single dataset
-    # to create df.csv run data concat.py file and uncomment the code below
-    
     # dataset = pd.read_csv('df.csv')
-    # # print(dataset.columns) # get column names
+    # print(dataset.columns) # get column names
     # inputs=dataset[['rpc','Tfi','m_dot','ins','L']]
     # outputs=dataset[['Tfo','vol','T_o']]
-    
+    # 
     # sns.pairplot(dataset, diag_kind='kde')
     # sns.pairplot(inputs, diag_kind='kde')
     # sns.pairplot(outputs, diag_kind='kde')
@@ -103,17 +89,17 @@ if __name__ == "__main__":
     err=Tfo-Tfo_surr
     err=(1-Tfo_surr/Tfo)*100
     
-    # Prediction graph
-    plt.figure()
+    plt.figure(figsize=(10, 8), dpi=100)
     plt.hist(err, bins=25)
     plt.xlabel('Prediction Error [%]')
     _ = plt.ylabel('Count')
     
-    min_lim = np.amin(Tfo_surr)
-    max_lim = np.amax(Tfo_surr)
+    min_lim = min(np.amin(Tfo_surr),np.amin(Tfo))
+    max_lim = max(np.amax(Tfo_surr),np.amax(Tfo))
     
-    # Validation graph
-    plt.figure()
+
+    
+    plt.figure(figsize=(10, 8), dpi=100)
     plt.axes(aspect='equal')
     plt.scatter(Tfo, Tfo_surr)
     plt.xlabel('True Values')

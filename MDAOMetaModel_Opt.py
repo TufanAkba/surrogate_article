@@ -13,8 +13,10 @@ import openmdao.api as om
 class surr(om.MetaModelUnStructuredComp):
     
     def initialize(self):
-        self.options.declare('test_folder',default='test',
+        self.options.declare('test_folder',default='test_folder',
                              desc='Test folder location of resp. surf.')
+        self.options.declare('kriging',default=False,
+                             desc='Select kriging or response surface method')
         super().initialize()
     
     def setup(self):
@@ -27,10 +29,16 @@ class surr(om.MetaModelUnStructuredComp):
         self.add_input('ins',training_data=np.loadtxt(test_folder + '/ins.csv'), units='m')
         self.add_input('L',training_data=np.loadtxt(test_folder + '/L.csv'), units='m')
         
-        self.add_output('vol',training_data=np.loadtxt(test_folder + '/vol.csv'), surrogate=om.ResponseSurface(), units='m**3')
-        self.add_output('Tfo',training_data=np.loadtxt(test_folder + '/Tfo.csv'), surrogate=om.ResponseSurface(), units='K')
-        self.add_output('T_o',training_data=np.loadtxt(test_folder + '/T_o.csv'), surrogate=om.ResponseSurface(), units='K')
+        if self.options['kriging']:
+            self.add_output('vol',training_data=np.loadtxt(test_folder + '/vol.csv'), surrogate=om.KrigingSurrogate(eval_rmse= True), units='m**3')
+            self.add_output('Tfo',training_data=np.loadtxt(test_folder + '/Tfo.csv'), surrogate=om.KrigingSurrogate(eval_rmse= True), units='K')
+            self.add_output('T_o',training_data=np.loadtxt(test_folder + '/T_o.csv'), surrogate=om.KrigingSurrogate(eval_rmse= True), units='K')
         
+        else:
+            self.add_output('vol',training_data=np.loadtxt(test_folder + '/vol.csv'), surrogate=om.ResponseSurface(), units='m**3')
+            self.add_output('Tfo',training_data=np.loadtxt(test_folder + '/Tfo.csv'), surrogate=om.ResponseSurface(), units='K')
+            self.add_output('T_o',training_data=np.loadtxt(test_folder + '/T_o.csv'), surrogate=om.ResponseSurface(), units='K')
+            
         self.declare_partials(['Tfo','T_o'],'*', method='fd')
         self.declare_partials('vol', ['rpc','ins','L'], method='fd')
         
@@ -43,6 +51,8 @@ class surrOpt(om.ExplicitComponent):
         self.options.declare('L', types=float, default=0.065, desc='Lenght of receiver for optimization')
         self.options.declare('s_RPC', types=float, default=0.015, desc='RPC thickness of receiver for optimization')
         self.options.declare('s_INS', types=float, default=0.1, desc='INS thickness of receiver for optimization')
+        self.options.declare('test_folder',default='test_folder', desc='Test folder location of resp. surf.')
+        self.options.declare('kriging',default=False, desc='Selecting kriging or response surface for surrogate')
     
     def setup(self):     
         
@@ -64,7 +74,9 @@ class surrOpt(om.ExplicitComponent):
         debug_print = ['desvars','objs','nl_cons','totals']
         
         self._problem = prob =  om.Problem()
-        prob.model.add_subsystem('surr', surr(),promotes=['*'])
+        prob.model.add_subsystem('surr', surr(test_folder=self.options['test_folder'],
+                                              kriging=self.options['kriging'])
+                                 ,promotes=['*'])
         prob.driver = om.ScipyOptimizeDriver(debug_print = debug_print,
                                              optimizer=optimizer, 
                                              tol=opt_tol,
@@ -102,14 +114,26 @@ class surrOpt(om.ExplicitComponent):
 
 if __name__ == "__main__":
     
+    import time
+    
+    st = time.time()
+    
     p = om.Problem()
     
-    p.model.add_subsystem('receiver', surrOpt())
+    kriging = False
+    
+    p.model.add_subsystem('receiver', surrOpt(test_folder='4_5',kriging=kriging))
+    
     p.setup()
+    
+    p.set_val('receiver.m_dot',0.00066, units='kg/s')
     
     p.run_model()
     
     p.model.list_outputs(units=True,prom_name=True,shape=False)
     p.model.list_inputs(units=True,prom_name=True,shape=False)
     
-    
+    if kriging:
+        print(surrOpt._metadata('Tfo')['rmse'][0, 0])
+
+    print("time", time.time() - st)

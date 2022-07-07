@@ -17,7 +17,7 @@ import glob
 if __name__ == "__main__":
     
     # TODO: locate the test data folder
-    folder = 'data'
+    folder = '4_5'
     
     all_files = glob.glob(folder + "/*.csv")
     df=pd.DataFrame()
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         data=pd.read_csv(f,header=None)
         df[title] = data
     
-    df.to_csv('df.csv', sep='\t', encoding='utf-8')
+    df.to_csv('df.csv', sep=',', encoding='utf-8')
     
     
     

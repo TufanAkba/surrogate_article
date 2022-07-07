@@ -19,7 +19,7 @@ from receiver import Receiver
 if __name__ == '__main__':
     # TODO: set the number of sampling.
     # In the article 10**4 used for training and 10**2 for validation
-    samples = 10 ** 4
+    samples = 4 ** 5
 
     t0 = time.time()
     disc_z = 20
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # p.model.add_objective('receiver.eff_S2G',scaler=scaler, adder=0)#, adder=-1,scaler=100)#scaling should be increased
 
     # Create a recorder
-    recorder = om.SqliteRecorder('cases.sql')
+    recorder = om.SqliteRecorder('4_5.sql')
 
     # Attach recorder to the driver
     p.driver.add_recorder(recorder)
