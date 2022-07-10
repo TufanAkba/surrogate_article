@@ -35,8 +35,8 @@ class surr(om.MetaModelUnStructuredComp):
             self.add_output('T_o',training_data=np.loadtxt(test_folder + '/T_o.csv'), surrogate=om.KrigingSurrogate(eval_rmse= True), units='K')
         
         else:
-            self.add_output('vol',training_data=np.loadtxt(test_folder + '/vol.csv'), surrogate=om.ResponseSurface(), units='m**3')
-            self.add_output('Tfo',training_data=np.loadtxt(test_folder + '/Tfo.csv'), surrogate=om.ResponseSurface(), units='K')
+            self.add_output('vol',training_data=np.loadtxt(test_folder + '/vol.csv'), surrogate=om.ResponseSurface(eval_rmse= True), units='m**3')
+            self.add_output('Tfo',training_data=np.loadtxt(test_folder + '/Tfo.csv'), surrogate=om.ResponseSurface(eval_rmse= True), units='K')
             self.add_output('T_o',training_data=np.loadtxt(test_folder + '/T_o.csv'), surrogate=om.ResponseSurface(), units='K')
             
         self.declare_partials(['Tfo','T_o'],'*', method='fd')
@@ -111,6 +111,9 @@ class surrOpt(om.ExplicitComponent):
         outputs['ins'] = prob['ins']
         outputs['L'] = prob['L']
         outputs['Tfo'] = prob['Tfo']
+        
+        if kriging:
+            print(self.surr._metadata('Tfo')['rmse'][0, 0])
 
 if __name__ == "__main__":
     
@@ -120,20 +123,17 @@ if __name__ == "__main__":
     
     p = om.Problem()
     
-    kriging = False
+    kriging = True
     
     p.model.add_subsystem('receiver', surrOpt(test_folder='4_5',kriging=kriging))
     
     p.setup()
     
-    p.set_val('receiver.m_dot',0.00066, units='kg/s')
+    p.set_val('receiver.m_dot',0.00066, units='kg/s') #rearrange to 66
     
     p.run_model()
     
     p.model.list_outputs(units=True,prom_name=True,shape=False)
     p.model.list_inputs(units=True,prom_name=True,shape=False)
-    
-    if kriging:
-        print(surrOpt._metadata('Tfo')['rmse'][0, 0])
 
     print("time", time.time() - st)
