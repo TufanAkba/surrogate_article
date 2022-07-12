@@ -71,6 +71,7 @@ if __name__ == "__main__":
     
     err=[]
     Tfo_surr = []
+
     for i in range(vol.size):
         p.set_val('vol',vol[i])
         p.set_val('Tfi',Tfi[i])
@@ -85,8 +86,9 @@ if __name__ == "__main__":
         
         Tfo_surr.append(float(p.get_val('Tfo')))
 
-    
+
     err=Tfo-Tfo_surr
+    
     err=(1-Tfo_surr/Tfo)*100
     
     plt.figure(figsize=(10, 8), dpi=100)
@@ -107,6 +109,13 @@ if __name__ == "__main__":
     lims = [min_lim, max_lim]
     plt.xlim(lims)
     plt.ylim(lims)
+    
+    RMS_text = "{:.2%}".format((np.corrcoef(Tfo, Tfo_surr)[0,1])**2)
+    RMSE = np.sqrt(np.square(np.subtract(Tfo,Tfo_surr)).mean())
+    
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    plt.text(1.05*min_lim, 0.95*max_lim, r'$R^2$' + f' = {RMS_text}',bbox=props)
+    
     _ = plt.plot(lims, lims)
     
     
