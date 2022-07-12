@@ -113,7 +113,7 @@ class surrOpt(om.ExplicitComponent):
         outputs['Tfo'] = prob['Tfo']
         
         if kriging:
-            print(self.surr._metadata('Tfo')['rmse'][0, 0])
+            print(prob.model.surr._metadata('Tfo')['rmse'][0, 0])
 
 if __name__ == "__main__":
     
