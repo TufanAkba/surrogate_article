@@ -1,5 +1,15 @@
 # surrogate_article
 
+Title: Geometric design of micro scale volumetric receiver using system-level inputs: An application of surrogate-based approach
+
+Journal: Solar Energy
+
+doi: [10.1016/j.renene.2022.12.105](https://doi.org/10.1016/j.solener.2023.111811)
+
+link: [https://www.sciencedirect.com/science/article/pii/S0960148122019012](https://www.sciencedirect.com/science/article/pii/S0038092X2300436X)
+
+This repo is looking as html dominant repo due to the n2 diagrams. It is actually pure python code and one n2 diagram.
+
 This repository contains the test/validation data and and codes used in the article.
 
 How to use this repo:
